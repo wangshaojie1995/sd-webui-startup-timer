@@ -1,15 +1,17 @@
+import time
 from secrets import compare_digest
 from threading import Lock
 from typing import Callable
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-
 from modules import shared, timer
 from modules.call_queue import queue_lock
 
 
 class Api:
+    version = 1
+
     def __init__(self, app: FastAPI, queue_lock: Lock, prefix: str = None) -> None:
         if shared.cmd_opts.api_auth:
             self.credentials = dict()
@@ -48,7 +50,9 @@ class Api:
 
     def startupTimer(self):
         startup_timer = timer.startup_timer
-        return startup_timer.dump()
+        version = self.version
+        self.version += 1
+        return {**startup_timer.dump(), "version": version}
 
 
 def on_app_started(_, app: FastAPI):
