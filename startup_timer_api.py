@@ -1,3 +1,4 @@
+import math
 import time
 from secrets import compare_digest
 from threading import Lock
@@ -5,6 +6,8 @@ from typing import Callable
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from startup_timer import startup_timer_class
+
 from modules import shared, timer
 from modules.call_queue import queue_lock
 
@@ -52,8 +55,18 @@ class Api:
         startup_timer = timer.startup_timer
         version = self.version
         self.version += 1
-        return {**startup_timer.dump(), "version": version}
+        modeLoaded = math.ceil(
+            startup_timer_class.modeLoadedTime - startup_timer_class.startedTime)
+        return {**startup_timer.dump(), "version": version, 'modeLoaded': modeLoaded}
 
 
 def on_app_started(_, app: FastAPI):
     Api(app, queue_lock, '/startup-timer')
+    startup_timer_class.startedTime = time.time()
+    # print('on_app_started -=-=-=-=-=',
+    #       startup_timer_class.startedTime)
+
+
+def on_model_loaded(sd_model):
+    startup_timer_class.modeLoadedTime = time.time()
+    # print('on_model_loaded -=-=-=-=-=', startup_timer_class.modeLoadedTime)
