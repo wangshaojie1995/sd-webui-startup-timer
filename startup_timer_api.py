@@ -6,10 +6,10 @@ from typing import Callable
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from startup_timer import startup_timer_class
-
 from modules import shared, timer
 from modules.call_queue import queue_lock
+
+from startup_timer import startup_timer_class
 
 
 class Api:
@@ -61,12 +61,9 @@ class Api:
 
 
 def on_app_started(_, app: FastAPI):
-    Api(app, queue_lock, '/startup-timer')
     startup_timer_class.startedTime = time.time()
-    # print('on_app_started -=-=-=-=-=',
-    #       startup_timer_class.startedTime)
+    Api(app, queue_lock, '/startup-timer')
 
 
 def on_model_loaded(sd_model):
     startup_timer_class.modeLoadedTime = time.time()
-    # print('on_model_loaded -=-=-=-=-=', startup_timer_class.modeLoadedTime)
