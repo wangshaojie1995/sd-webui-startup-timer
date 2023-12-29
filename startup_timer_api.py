@@ -29,7 +29,7 @@ class Api:
         self.prefix = prefix
 
         self.add_api_route(
-            'startup-timer/detail',
+            '/startup-timer/detail',
             self.startupTimer,
             methods=['GET'],
         )
