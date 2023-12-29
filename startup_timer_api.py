@@ -1,10 +1,12 @@
 import math
+import os
 import time
 from secrets import compare_digest
 from threading import Lock
 from typing import Callable
 
-from fastapi import Depends, FastAPI, HTTPException
+import requests
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from modules import shared, timer
 from modules.call_queue import queue_lock
@@ -27,8 +29,13 @@ class Api:
         self.prefix = prefix
 
         self.add_api_route(
-            'detail',
+            'startup-timer/detail',
             self.startupTimer,
+            methods=['GET'],
+        )
+        self.add_api_route(
+            '/pre-stop',
+            self.preStop,
             methods=['GET'],
         )
 
@@ -59,10 +66,18 @@ class Api:
             startup_timer_class.modeLoadedTime - startup_timer_class.startedTime)
         return {**startup_timer.dump(), "version": version, 'modeLoaded': modeLoaded}
 
+    def preStop(self, request: Request):
+        url = os.environ.get('API_PRE_STOP_URL')
+        if url is None:
+            return {}
+        requests.post(
+            url, json={'function_name': request.headers['x-fc-function-name']}, timeout=1)
+        return {}
+
 
 def on_app_started(_, app: FastAPI):
     startup_timer_class.startedTime = time.time()
-    Api(app, queue_lock, '/startup-timer')
+    Api(app, queue_lock, '')
 
 
 def on_model_loaded(sd_model):
