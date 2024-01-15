@@ -41,7 +41,7 @@ class Api:
         self.add_api_route(
             '/initialize',
             self.initializer,
-            methods=['GET'],
+            methods=['POST'],
         )
 
     def auth(self, creds: HTTPBasicCredentials = Depends(HTTPBasic())):
