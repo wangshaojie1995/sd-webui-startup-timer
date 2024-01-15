@@ -38,6 +38,11 @@ class Api:
             self.preStop,
             methods=['GET'],
         )
+        self.add_api_route(
+            '/initialize',
+            self.initializer,
+            methods=['GET'],
+        )
 
     def auth(self, creds: HTTPBasicCredentials = Depends(HTTPBasic())):
         if creds.username in self.credentials:
