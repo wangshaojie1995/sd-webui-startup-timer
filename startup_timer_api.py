@@ -74,6 +74,14 @@ class Api:
             url, json={'function_name': request.headers['x-fc-function-name']}, timeout=1)
         return {}
 
+    def initializer(self, request: Request):
+        url = os.environ.get('API_INITIALIZER_URL')
+        if url is None:
+            return {}
+        requests.post(
+            url, json={'function_name': request.headers['x-fc-function-name']}, timeout=1)
+        return {}
+
 
 def on_app_started(_, app: FastAPI):
     startup_timer_class.startedTime = time.time()
