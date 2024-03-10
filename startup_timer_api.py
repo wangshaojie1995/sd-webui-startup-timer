@@ -69,7 +69,7 @@ class Api:
         self.version += 1
         modeLoaded = math.ceil(
             startup_timer_class.modeLoadedTime - startup_timer_class.startedTime)
-        return {**startup_timer.dump(), "version": version, 'modeLoaded': modeLoaded}
+        return {**startup_timer.dump(), "version": version, 'modeLoaded': modeLoaded,'modelDownload': shared.model_download_time}
 
     def preStop(self, request: Request):
         url = os.environ.get('API_PRE_STOP_URL')
